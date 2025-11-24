@@ -1,0 +1,17 @@
+{
+  "underweight": [
+    "Ăn nhiều bữa nhỏ trong ngày",
+    "Tăng cường protein và tinh bột",
+    "Ngủ đủ giấc và tập luyện vừa phải"
+  ],
+  "normal": [
+    "Duy trì chế độ ăn cân bằng",
+    "Tập thể dục thường xuyên",
+    "Theo dõi cân nặng định kỳ"
+  ],
+  "overweight": [
+    "Hạn chế đồ ngọt và nước uống có ga",
+    "Tăng cường rau xanh và chất xơ",
+    "Tập thể dục ít nhất 30 phút mỗi ngày"
+  ]
+}
