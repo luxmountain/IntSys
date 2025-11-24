@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự đoán Bệnh Tiểu Đường</title>
+    <style>
+        /* CSS Reset and Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Result and Loading */
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            /* Mặc định ẩn */
+            font-weight: bold;
+        }
+
+        .result.success {
+            background-color: #ebfcf3;
+            /* Light Green */
+            border: 2px solid #008000;
+            color: #008000;
+            /* Dark Green */
+        }
+
+        .result.danger {
+            background-color: #fcebeb;
+            /* Light Red */
+            border: 2px solid #cc0000;
+            color: #cc0000;
+            /* Dark Red */
+        }
+
+        .probability {
+            font-size: 1.6em;
+            font-weight: bold;
+            margin: 10px 0;
+            display: block;
+        }
+
+        /* Info Box */
+        .info {
+            background: #e7f3ff;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .info p {
+            margin: 5px 0;
+            color: #1976d2;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            /* Mặc định ẩn */
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Dự đoán Bệnh Tiểu Đường</h1>
+        <p class="subtitle">Nhập thông tin để nhận dự đoán từ mô hình AI</p>
+
+        <form id="predictionForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pregnancies">1. Số lần mang thai (Pregnancies):</label>
+                    <input type="number" id="pregnancies" name="Pregnancies" min="0" max="20" value="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="glucose">2. Nồng độ Glucose (mg/dL):</label>
+                    <input type="number" id="glucose" name="Glucose" min="0" max="300" value="100" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="blood_pressure">3. Huyết áp tâm trương (mm Hg):</label>
+                    <input type="number" id="blood_pressure" name="BloodPressure" min="0" max="150" value="70" required>
+                </div>
+                <div class="form-group">
+                    <label for="skin_thickness">4. Độ dày da (mm):</label>
+                    <input type="number" id="skin_thickness" name="SkinThickness" min="0" max="100" value="20" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="insulin">5. Insulin (mu U/ml):</label>
+                    <input type="number" id="insulin" name="Insulin" min="0" max="1000" value="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="bmi">6. Chỉ số BMI (kg/m²):</label>
+                    <input type="number" id="bmi" name="BMI" min="0" max="70" step="0.1" value="25.0" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="diabetes_pedigree">7. Chức năng phả hệ Tiểu đường:</label>
+                    <input type="number" id="diabetes_pedigree" name="DiabetesPedigreeFunction" min="0" max="3"
+                        step="0.01" value="0.5" required>
+                </div>
+                <div class="form-group">
+                    <label for="age">8. Tuổi (Age):</label>
+                    <input type="number" id="age" name="Age" min="0" max="120" value="30" required>
+                </div>
+            </div>
+
+            <button type="submit">Dự đoán</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Đang xử lý...</p>
+        </div>
+
+        <div class="result" id="result">
+            <h2 id="result_title"></h2>
+            <span class="probability" id="probability"></span>
+        </div>
+
+        <div class="info" id="info">
+            <p><strong>Lưu ý:</strong> Đây chỉ là dự đoán dựa trên mô hình AI.</p>
+            <p>Vui lòng tham khảo ý kiến bác sĩ để có chẩn đoán chính xác.</p>
+        </div>
+
+    </div>
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Lấy các element DOM
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const result_title = document.getElementById('result_title');
+            const probability = document.getElementById('probability');
+
+            // Hiển thị loading và ẩn kết quả cũ
+            loading.style.display = 'block';
+            result.style.display = 'none';
+
+            // Lấy dữ liệu từ form
+            // Đảm bảo tên khóa trùng với thuộc tính 'name' trong input và keys trong backend Flask
+            const formData = {
+                pregnancies: document.getElementById('pregnancies').value,
+                glucose: document.getElementById('glucose').value,
+                blood_pressure: document.getElementById('blood_pressure').value,
+                skin_thickness: document.getElementById('skin_thickness').value,
+                insulin: document.getElementById('insulin').value,
+                bmi: document.getElementById('bmi').value,
+                diabetes_pedigree: document.getElementById('diabetes_pedigree').value,
+                age: document.getElementById('age').value
+            };
+
+
+            try {
+                // Gửi dữ liệu đến endpoint Flask /predict
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                // Ẩn loading
+                loading.style.display = 'none';
+
+                // Hiển thị kết quả
+                if (data.status === 'success') {
+                    result.style.display = 'block';
+
+                    // Đặt màu và nội dung dựa trên dự đoán
+                    if (data.prediction === 1) {
+                        result.className = 'result danger';
+                        result_title.textContent = '⚠️ CÓ NGUY CƠ MẮC BỆNH TIỂU ĐƯỜNG';
+                    } else {
+                        result.className = 'result success';
+                        result_title.textContent = '✅ KHÔNG CÓ NGUY CƠ MẮC BỆNH TIỂU ĐƯỜNG';
+                    }
+
+                    // Hiển thị xác suất làm tròn 2 chữ số thập phân
+                    probability.textContent = `Xác suất: ${(data.probability * 100).toFixed(2)}%`;
+                } else {
+                    alert('Có lỗi xảy ra: ' + data.message);
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                alert('Có lỗi xảy ra: ' + error.message);
+            }
+        });
+    </script>
+</body>
+
+</html>
