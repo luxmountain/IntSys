@@ -1,12 +1,15 @@
 # ---Phan Thị Hồng Thắm - B22DCCN806---
 
 # App.
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
 from flask import Flask, render_template, request, jsonify
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 import pickle
-import os
 
 app = Flask(__name__)
 
@@ -58,6 +61,6 @@ def predict():
         return jsonify({'status': 'error', 'message': str(e)})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=False)
+    app.run(debug=True, host='127.0.0.1', port=5000, use_reloader=False)
 
 # 74

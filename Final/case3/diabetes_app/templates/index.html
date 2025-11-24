@@ -304,13 +304,14 @@
                     }
 
                     // Hiển thị xác suất làm tròn 2 chữ số thập phân
-                    probability.textContent = `Xác suất: ${(data.probability * 100).toFixed(2)}%`;
+                    probability.textContent = `Xác suất: ${data.probability.toFixed(2)}%`;
                 } else {
                     alert('Có lỗi xảy ra: ' + data.message);
                 }
             } catch (error) {
                 loading.style.display = 'none';
-                alert('Có lỗi xảy ra: ' + error.message);
+                alert('Có lỗi xảy ra khi kết nối: ' + error.message);
+                console.error('Error:', error);
             }
         });
     </script>
